@@ -4,12 +4,16 @@ import { tuple } from './util'
 
 type SpinIndicator = React.ReactElement<HTMLElement>
 interface SpinProps {
-    prefixCls: string
+    prefixCls?: string
     className?: string
     spinning?: boolean
     style?: React.CSSProperties
     delay?: number
     indicator?: SpinIndicator
+}
+const omit = (obj: any, arr: string[]) => {
+	arr.map(key => { obj[key] && delete obj[key] })
+	return obj
 }
 const defaultIndicator: React.ReactNode = null
 const renderIndicator = (prefixCls: string, props: SpinProps): React.ReactNode => {
@@ -29,7 +33,7 @@ const renderIndicator = (prefixCls: string, props: SpinProps): React.ReactNode =
 		})
 	}
 	return (
-		<span className={classnames(dotClassName, `${prefixCls}`)}>
+		<span className={classnames(dotClassName, `${prefixCls}-dot-spin`)}>
 			<i className={`${prefixCls}-dot-item`}></i>
 			<i className={`${prefixCls}-dot-item`}></i>
 			<i className={`${prefixCls}-dot-item`}></i>
@@ -37,7 +41,27 @@ const renderIndicator = (prefixCls: string, props: SpinProps): React.ReactNode =
 		</span>
 	)
 }
-const Spin: React.FC<{}> = props => {
-	return <div></div>
+const Spin: React.FC<SpinProps> = props => {
+	const renderSpir = () => {
+		const {
+			prefixCls = 'spin',
+			className,
+			style,
+			...restProps
+		}  = props
+        
+		const spinClassName = classnames(
+			`${prefixCls}__wrap`, {}, className
+		)
+		const divProps = omit(restProps, [ 'spinning', 'indicator', 'delay' ])
+        
+		const spinElement = (
+			<div {...divProps} style={style} className={spinClassName}>
+				{renderIndicator(prefixCls, props)}
+			</div>
+		)
+		return spinElement
+	}
+	return <>{ renderSpir() }</>
 }
 export default Spin
